@@ -154,7 +154,7 @@ if __name__ == "__main__":
     print(len(final_lines))
     print(f"Splitting time: {end - start:.6f} seconds")
 
-    print(final_lines[0:20])
+    # print(final_lines[0:20])
     # i = 0
     # for line in final_lines:
     #     print(i, line)
