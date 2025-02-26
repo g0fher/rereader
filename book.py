@@ -10,29 +10,8 @@ from functools import lru_cache
 import time
 
 
-# def extract_text_from_epub(epub_file):
-#     book = epub.read_epub(epub_file)
-#     text = ""
 
-#     # Iterate through all the items in the book
-#     for item in book.get_items():
-#         if item.get_type() == ebooklib.ITEM_DOCUMENT:
-#             # print(item.get_body_content())
-#             # Extract the HTML content
-#             content = item.get_body_content().decode('utf-8')
-
-#             # Remove HTML tags and unescape HTML entities
-#             content = re.sub(r'<[^>]+>', '', content)  # Remove tags
-#             content = unescape(content).strip()  # Convert HTML entities
-            
-#             text += content + "\n\nASSASS"  # Keep paragraphs separated
-    
-#     return text
-
-
-
-
-def break_text_into_lines(text, max_width_px, font):    
+def break_text_into_lines(text, max_width_px, font):  
     # Split the text into chunks (words) by whitespaces
     words = text.split()
     
@@ -40,13 +19,9 @@ def break_text_into_lines(text, max_width_px, font):
     current_line = []
     current_width = 0
 
-    @lru_cache(maxsize=None)
-    def get_word_width(word):
-        return font.getlength(word + " ")
-
     for word in words:
         # Get word width
-        word_width = get_word_width(word)
+        word_width = get_word_width(word, font)
         # word_width = font.getlength(word + " ")
         # Line overflow
         if current_width + word_width > max_width_px:
@@ -107,6 +82,11 @@ def combine_paragraphs(paragraphs):
 
     return complete_book
 
+
+@lru_cache(maxsize=None)
+def get_word_width(word, font):
+    return font.getlength(word + " ")
+
 if __name__ == "__main__":
 
     print("Start")
@@ -118,7 +98,9 @@ if __name__ == "__main__":
 
     # book_path = 'djury.epub'
     # book_path = 'The Three-Body Problem.epub'
-    book_path = 'hemingway-old-man-and-the-sea.epub'
+    # book_path = 'hemingway-old-man-and-the-sea.epub'
+    book_path = 'louisa-may-alcott_little-women.epub'
+    # book_path = 'daniel-defoe_the-life-and-adventures-of-robinson-crusoe.epub'
 
     font_path = "PTSans-Regular.ttf"
     # text = "But the commander was afraid of the dozen or so iron stoves inside the building, filled with explosives and connected to each other by electric detonators. He couldn’t see them, but he could feel their presence like iron sensing the pull of a nearby magnet. If a defender flipped the switch, revolutionaries and counter-revolutionaries alike would all die in one giant ball of fire."
@@ -126,7 +108,6 @@ if __name__ == "__main__":
     font_size = 32
 
     font = ImageFont.truetype(font_path, font_size)
-    print(font.getlength("The author and publisher have provided this e-book to you without Digital" + " "))
 
 
     
