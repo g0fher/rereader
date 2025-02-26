@@ -27,19 +27,17 @@ class BookApp(App):
         # book_path = 'djury.epub' #ass
 
         self.font_size = 24
-        self.line_height = 1.2
+        self.line_height = 1
         self.font_bb_height = 26
         self.white_space_length = 9
 
-        layout_padding = 10
+        layout_padding = 0
         layout = BoxLayout(orientation='vertical', padding=layout_padding)
 
-        window_size_x = 520
+        window_size_x = 500
         window_size_y = 850
         scale = Window.dpi / 96
         Window.size = (window_size_x / scale, window_size_y / scale)
-
-        self.first_resize = True
 
         # Main reading area text
         self.text_label = Label(
@@ -56,9 +54,9 @@ class BookApp(App):
         )
 
         self.lines_per_page = 0
-        self.text_area_width = window_size_x - layout_padding * 2 + self.white_space_length
+        self.text_area_width = window_size_x - layout_padding * 2
         print(self.text_area_width)
-        self.text_label.bind(texture_size=self.update_label_height)
+        self.text_label.bind(texture_size=self.update_label_area_size)
         self.text_label.bind(size=self.update_label_text_size)
 
         # Pagination Controls
@@ -81,15 +79,16 @@ class BookApp(App):
         print("Number of paragraphs:", len(self.pars))
 
 
-        self.par_cap = 100
+        self.par_cap = 5
         self.resplit_lines()
         self.lines_per_page = 18
-        self.update_lines(self.lines_per_page)
+        self.update_lines()
 
         return layout
     
     def resplit_lines(self):
-        self.final_lines = []
+        print("============")
+        self.final_lines = ["............................................................................ "]
         start = time.perf_counter()
         self.final_lines = book.split_pars_into_lines(self.final_lines, self.pars[0:self.par_cap], self.text_area_width, self.font)
         end = time.perf_counter()
@@ -98,42 +97,49 @@ class BookApp(App):
         print("Number of lines:", len(self.final_lines))
         self.number_of_lines = len(self.final_lines)
         self.current_line_index = 0
-        self.update_lines(self.lines_per_page)
+        self.update_lines()
 
     def next_line(self, instance):
         if self.current_line_index < self.number_of_lines - 1:
             self.current_line_index += self.lines_per_page
-            self.update_lines(self.lines_per_page)
+            self.update_lines()
         
     def prev_line(self, instance):
         if self.current_line_index > 0:
             self.current_line_index -= self.lines_per_page
-            self.update_lines(self.lines_per_page)
+            self.update_lines()
 
-    def update_lines(self, lines_per_page):
-        self.text_label.text = self.display_lines(lines_per_page)
+    def update_lines(self):
+        print("Lpp:", self.lines_per_page)
+        self.text_label.text = self.display_lines()
 
-    def update_label_height(self, instance, size):
-        # Resize the label's texture area to match the window height
+    def update_label_area_size(self, instance, size):
+        # Resize the label's texture height and width to match the window height
+        # I don't understand how it works, but this line is important
         self.text_label.height = size[1]
-        self.text_area_width = self.text_label.width
-        print("Width:", self.text_area_width)
-        self.resplit_lines()
+
         self.lines_per_page = floor(self.text_label.height / (self.font_bb_height + self.line_height * self.font_bb_height)) + 1
-        print("Height:", self.text_label.height, "Lpp:", self.lines_per_page)
+        
+        # Don't resplit the lines in case of only height changes
+        if self.text_area_width != self.text_label.width:
+            self.text_area_width = self.text_label.width
+            # Don't resplit on the first resize because it's incorrect
+            self.resplit_lines()
+
+        print("Width:", int(self.text_area_width), "Height:", int(self.text_label.height), "Lpp:", self.lines_per_page)
     
     def update_label_text_size(self, instance, value):
         # Update the text size when the label's size changes
         instance.text_size = instance.size
 
-    def display_lines(self, lines_per_page):
+    def display_lines(self):
         if self.current_line_index > self.number_of_lines - 1:
             print("Line index exceeding total number of lines")
             return -1
         page = ""
-        print("============")
-        for i in range(self.current_line_index, self.current_line_index + lines_per_page):
+        for i in range(self.current_line_index, self.current_line_index + self.lines_per_page):
             print(i, self.final_lines[i])
+            # print(i, self.final_lines[i], end="")
             page += self.final_lines[i]
 
             if i > self.number_of_lines - 1:

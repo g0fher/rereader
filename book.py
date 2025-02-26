@@ -10,7 +10,6 @@ from functools import lru_cache
 import time
 
 
-
 def break_text_into_lines(text, max_width_px, font):  
     # Split the text into chunks (words) by whitespaces
     words = text.split()
@@ -71,17 +70,10 @@ def split_pars_into_lines(final_lines, paragraphs, max_width_px, font):
         lines = break_text_into_lines(par, max_width_px, font)
         for line in lines:
             final_lines.append(line + " ")
+            # final_lines.append(line + "\n")
         final_lines[len(final_lines) - 1] += "\n"
     
     return final_lines
-
-def combine_paragraphs(paragraphs):
-    complete_book = ""
-    for par in paragraphs:
-        complete_book += par + "\n"
-
-    return complete_book
-
 
 @lru_cache(maxsize=None)
 def get_word_width(word, font):
@@ -103,12 +95,16 @@ if __name__ == "__main__":
     # book_path = 'daniel-defoe_the-life-and-adventures-of-robinson-crusoe.epub'
 
     font_path = "PTSans-Regular.ttf"
-    # text = "But the commander was afraid of the dozen or so iron stoves inside the building, filled with explosives and connected to each other by electric detonators. He couldn’t see them, but he could feel their presence like iron sensing the pull of a nearby magnet. If a defender flipped the switch, revolutionaries and counter-revolutionaries alike would all die in one giant ball of fire."
     max_width = 1080
-    font_size = 32
+    font_size = 24
 
     font = ImageFont.truetype(font_path, font_size)
 
+    # text = "test123test123test123test123blablatesetassasi"
+    # text = "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiit"
+    text = "............................................................................"
+
+    print(get_word_width(text, font))
 
     
     # space_width = font.getbbox(" ")[2]
@@ -117,23 +113,22 @@ if __name__ == "__main__":
     # font_height = bbox[3] - bbox[1]
 
 
-    # book_path = 'All Clear.epub'
-    pars = extract_paragraphs_from_epub(book_path)
-    print("Done paragraphs")
+    # pars = extract_paragraphs_from_epub(book_path)
+    # print("Done paragraphs")
     # par = extract_text_from_epub(book_path)
-    print("Number of paragraphs:", len(pars))
+    # print("Number of paragraphs:", len(pars))
     # print(pars[0:20])
 
-    final_lines = []
+    # final_lines = []
 
-    start = time.perf_counter()
-    final_lines = split_pars_into_lines(final_lines, pars, max_width, font)
+    # start = time.perf_counter()
+    # final_lines = split_pars_into_lines(final_lines, pars, max_width, font)
     # final_lines = split_pars_into_lines(final_lines, pars[601:1200], max_width, font)
-    end = time.perf_counter()
+    # end = time.perf_counter()
 
-    print("Done splitting")
-    print(len(final_lines))
-    print(f"Splitting time: {end - start:.6f} seconds")
+    # print("Done splitting")
+    # print(len(final_lines))
+    # print(f"Splitting time: {end - start:.6f} seconds")
 
     # print(final_lines[0:20])
     # i = 0
