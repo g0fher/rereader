@@ -10,35 +10,6 @@ from functools import lru_cache
 import time
 
 
-def break_text_into_lines(text, max_width_px, font):  
-    # Split the text into chunks (words) by whitespaces
-    words = text.split()
-    
-    lines = []
-    current_line = []
-    current_width = 0
-
-    for word in words:
-        # Get word width
-        word_width = get_word_width(word, font)
-        # word_width = font.getlength(word + " ")
-        # Line overflow
-        if current_width + word_width > max_width_px:
-            lines.append(" ".join(current_line))
-            # Begin new line with the current word
-            current_line = [word]
-            current_width = word_width
-        else:
-            current_line.append(word)
-            current_width += word_width
-
-    # If there's anything left, put it in the last line
-    if current_line:
-        lines.append(" ".join(current_line))
-
-    return lines
-
-
 def extract_paragraphs_from_epub(epub_file):
     book = epub.read_epub(epub_file)
     
@@ -65,44 +36,72 @@ def extract_paragraphs_from_epub(epub_file):
     
     return paragraphs
 
+def break_text_into_lines(text, max_width_px, font):  
+    # Split the text into chunks (words) by whitespaces
+    words = text.split()
+    
+    lines = []
+    current_line = []
+    current_width = 0
+
+    whitespace_width = get_word_width(" ", font)
+
+    for word in words:
+        word_width = get_word_width(word, font)
+        # word_width = font.getlength(word + " ")
+        # Line overflow
+        if current_width + word_width > max_width_px:
+            current_line[-1] = current_line[-1].rstrip()
+            lines.append("".join(current_line))
+            # Begin new line with the current word
+            current_line = [word + " "] 
+            current_width = word_width + whitespace_width
+        else:
+            current_line.append(word + " ")
+            current_width += word_width + whitespace_width
+
+    # If there's anything left, put it in the last line
+    if current_line:
+        current_line[-1] = current_line[-1].rstrip()
+        lines.append("".join(current_line))
+
+    return lines
+
 def split_pars_into_lines(final_lines, paragraphs, max_width_px, font):
     for par in paragraphs:
         lines = break_text_into_lines(par, max_width_px, font)
         for line in lines:
-            final_lines.append(line + " ")
-            # final_lines.append(line + "\n")
-        final_lines[len(final_lines) - 1] += "\n"
+            # final_lines.append(line + " ")
+            final_lines.append(line + "\n")
+        # final_lines[len(final_lines) - 1] += "\n"
     
     return final_lines
 
 @lru_cache(maxsize=None)
 def get_word_width(word, font):
-    return font.getlength(word + " ")
+    return font.getlength(word)
 
 if __name__ == "__main__":
 
     print("Start")
 
     # par = extract_paragraphs_from_epub('The Billiard Ball Asimov Isaac.epub')
-    # par = extract_text_from_epub('The Billiard Ball Asimov Isaac.epub')
-    # par = extract_text_from_epub('story_of_your_life.epub')
-    # par = extract_text_from_epub('The Three-Body Problem.epub')
 
     # book_path = 'djury.epub'
     # book_path = 'The Three-Body Problem.epub'
     # book_path = 'hemingway-old-man-and-the-sea.epub'
-    book_path = 'louisa-may-alcott_little-women.epub'
-    # book_path = 'daniel-defoe_the-life-and-adventures-of-robinson-crusoe.epub'
+    # book_path = 'louisa-may-alcott_little-women.epub'
+    book_path = 'daniel-defoe_the-life-and-adventures-of-robinson-crusoe.epub'
 
     font_path = "PTSans-Regular.ttf"
-    max_width = 1080
+    max_width = 500
     font_size = 24
 
     font = ImageFont.truetype(font_path, font_size)
 
     # text = "test123test123test123test123blablatesetassasi"
     # text = "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiit"
-    text = "............................................................................"
+    text = ""
 
     print(get_word_width(text, font))
 
@@ -113,22 +112,25 @@ if __name__ == "__main__":
     # font_height = bbox[3] - bbox[1]
 
 
-    # pars = extract_paragraphs_from_epub(book_path)
-    # print("Done paragraphs")
-    # par = extract_text_from_epub(book_path)
-    # print("Number of paragraphs:", len(pars))
-    # print(pars[0:20])
+    pars = extract_paragraphs_from_epub(book_path)
+    print("Done paragraphs")
+    print("Number of paragraphs:", len(pars))
+    # for par in pars[0:5]:
+    #     print(par, "\n")
 
-    # final_lines = []
+    # broken = break_text_into_lines(pars[1], max_width, font)
+    # for line in broken:
+    #     print(f"|{line}|")
 
-    # start = time.perf_counter()
-    # final_lines = split_pars_into_lines(final_lines, pars, max_width, font)
-    # final_lines = split_pars_into_lines(final_lines, pars[601:1200], max_width, font)
-    # end = time.perf_counter()
+    final_lines = []
 
-    # print("Done splitting")
-    # print(len(final_lines))
-    # print(f"Splitting time: {end - start:.6f} seconds")
+    start = time.perf_counter()
+    final_lines = split_pars_into_lines(final_lines, pars, max_width, font)
+    end = time.perf_counter()
+
+    print("Done splitting")
+    print(len(final_lines))
+    print(f"Splitting time: {end - start:.6f} seconds")
 
     # print(final_lines[0:20])
     # i = 0
