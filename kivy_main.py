@@ -13,113 +13,113 @@ import time
 
 import book
 
-class ClickableLabel(Label):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.normal_color = (1, 1, 1, 1)
-        self.highlight_color = (0, 1, 0, 1)
+# class ClickableLabel(Label):
+#     def __init__(self, **kwargs):
+#         super().__init__(**kwargs)
+#         self.normal_color = (1, 1, 1, 1)
+#         self.highlight_color = (0, 1, 0, 1)
 
-    def activate_long_press(self, dt):
-        app = App.get_running_app()
-        if not app.lifted_before_clock:
-            app.is_long_press_on = True
-            self.long_press_active = True
-            self.color = self.highlight_color
-            print(f"Long press activated on: {self.text}")
-        else:
-            print("Failed hold")
+#     def activate_long_press(self, dt):
+#         app = App.get_running_app()
+#         if not app.lifted_before_clock:
+#             app.is_long_press_on = True
+#             self.long_press_active = True
+#             self.color = self.highlight_color
+#             print(f"Long press activated on: {self.text}")
+#         else:
+#             print("Failed hold")
 
-    def on_touch_down(self, touch):
-        app = App.get_running_app()
-        if self.collide_point(*touch.pos):
-            # Start a timer for long press detection (0.5 seconds)
-            app.lifted_before_clock = False
-            Clock.schedule_once(self.activate_long_press, 0.5)
-            return True  # Consume touch
-        return super().on_touch_down(touch)
+#     def on_touch_down(self, touch):
+#         app = App.get_running_app()
+#         if self.collide_point(*touch.pos):
+#             # Start a timer for long press detection (0.5 seconds)
+#             app.lifted_before_clock = False
+#             Clock.schedule_once(self.activate_long_press, 0.5)
+#             return True  # Consume touch
+#         return super().on_touch_down(touch)
 
-    def on_touch_move(self, touch):
-        app = App.get_running_app()
-        if app.is_long_press_on:
-            if self.collide_point(*touch.pos):
-                self.color = self.highlight_color
-                app.is_on_label = True
-                print(f"Over: {self.text}")
-                return True
-            else:
-                self.color = self.normal_color
-                app.is_on_label = False
-        return super().on_touch_move(touch)
+#     def on_touch_move(self, touch):
+#         app = App.get_running_app()
+#         if app.is_long_press_on:
+#             if self.collide_point(*touch.pos):
+#                 self.color = self.highlight_color
+#                 app.is_on_label = True
+#                 print(f"Over: {self.text}")
+#                 return True
+#             else:
+#                 self.color = self.normal_color
+#                 app.is_on_label = False
+#         return super().on_touch_move(touch)
     
-    def on_touch_up(self, touch):
-        app = App.get_running_app()
-        if app.is_long_press_on:
-            app.is_long_press_on = False
-            # self.parent.clear_hightlights()
-            app.clear_hightlights_all()
-            if app.is_on_label:
-                print("Lifted on")
-            else:
-                print("Lifted off")
-            return True
-        else:
-            app.lifted_before_clock = True
+#     def on_touch_up(self, touch):
+#         app = App.get_running_app()
+#         if app.is_long_press_on:
+#             app.is_long_press_on = False
+#             # self.parent.clear_hightlights()
+#             app.clear_hightlights_all()
+#             if app.is_on_label:
+#                 print("Lifted on")
+#             else:
+#                 print("Lifted off")
+#             return True
+#         else:
+#             app.lifted_before_clock = True
             
-        return super().on_touch_up(touch)
+#         return super().on_touch_up(touch)
 
-class JustifiedBoxLayout(BoxLayout):
-    def __init__(self, words, height, **kwargs):
-        super().__init__(**kwargs)
-        self.words = words
-        self.orientation = 'horizontal'
-        self.size_hint_y = None
-        self.height = height
-        self.bind(size=self.update_layout)
+# class JustifiedBoxLayout(BoxLayout):
+#     def __init__(self, words, height, **kwargs):
+#         super().__init__(**kwargs)
+#         self.words = words
+#         self.orientation = 'horizontal'
+#         self.size_hint_y = None
+#         self.height = height
+#         self.bind(size=self.update_layout)
 
-        # Create labels for each word
-        for word in words:
-            label = ClickableLabel(text=word, size_hint_x=None)
-            self.add_widget(label)
+#         # Create labels for each word
+#         for word in words:
+#             label = ClickableLabel(text=word, size_hint_x=None)
+#             self.add_widget(label)
 
-        # self.update_layout()
-        Clock.schedule_once(self.update_layout, 0)
+#         # self.update_layout()
+#         Clock.schedule_once(self.update_layout, 0)
     
-    def clear_hightlights(self):
-        # Loop through all children of the layout
-        for child in self.children:
-            # Check if the child is a Label (or a subclass like ClickableLabel)
-            if isinstance(child, Label):  
-                child.color = (1, 1, 1, 1)
+#     def clear_hightlights(self):
+#         # Loop through all children of the layout
+#         for child in self.children:
+#             # Check if the child is a Label (or a subclass like ClickableLabel)
+#             if isinstance(child, Label):  
+#                 child.color = (1, 1, 1, 1)
     
-    def update_layout(self, *args):
-        """ Adjusts label width and spacing to ensure even distribution """
-        if not self.children:
-            return
+#     def update_layout(self, *args):
+#         """ Adjusts label width and spacing to ensure even distribution """
+#         if not self.children:
+#             return
 
-        total_label_width = sum(child.texture_size[0] for child in self.children)
-        available_width = self.width
+#         total_label_width = sum(child.texture_size[0] for child in self.children)
+#         available_width = self.width
 
-        # Calculate the number of gaps between labels
-        gap_count = len(self.children) - 1
+#         # Calculate the number of gaps between labels
+#         gap_count = len(self.children) - 1
 
-        # No negative spacing
-        if gap_count > 0:
-            # Evenly distribute remaining space
-            spacing = max((available_width - total_label_width) / gap_count, 0)
-        else:
-            spacing = 0
+#         # No negative spacing
+#         if gap_count > 0:
+#             # Evenly distribute remaining space
+#             spacing = max((available_width - total_label_width) / gap_count, 0)
+#         else:
+#             spacing = 0
 
-        # Update label sizes and positions
-        # Start placing labels from the left edge
-        x_offset = 0
-        for child in self.children:
-            child.size_hint_x = None
-            child.width = child.texture_size[0]
-            child.x = x_offset
-            # Move to the next position
-            x_offset += child.width + spacing
+#         # Update label sizes and positions
+#         # Start placing labels from the left edge
+#         x_offset = 0
+#         for child in self.children:
+#             child.size_hint_x = None
+#             child.width = child.texture_size[0]
+#             child.x = x_offset
+#             # Move to the next position
+#             x_offset += child.width + spacing
 
-        self.spacing = spacing
+#         self.spacing = spacing
 
 
 
@@ -132,16 +132,7 @@ class BookApp(App):
 
     def build(self):
 
-
-        # book_path = 'The Billiard Ball Asimov Isaac.epub'
-        # book_path = 'story_of_your_life.epub' # need to use text function for that
-        # book_path = 'The Three-Body Problem.epub'
-        # book_path = 'hemingway-old-man-and-the-sea.epub'
-        # book_path = 'louisa-may-alcott_little-women.epub'
         book_path = 'daniel-defoe_the-life-and-adventures-of-robinson-crusoe.epub'
-        # book_path = 'All Clear.epub'
-        # book_path = 'Good-Omens.epub'
-        # book_path = 'djury.epub' #ass
 
         self.font_size = 24
         self.line_height = 1
@@ -163,8 +154,8 @@ class BookApp(App):
             size_hint_y=0.85, 
             text_size=(None, None), 
             valign='middle', 
-            halign='left',
-            # halign='justify',
+            # halign='left',
+            halign='justify',
             font_name='PTSans-Regular.ttf',
             font_size=self.font_size,
             line_height=self.line_height
@@ -196,12 +187,28 @@ class BookApp(App):
         print("Number of paragraphs:", len(self.pars))
 
 
-        self.par_cap = 5
+        self.par_cap = 20
         self.resplit_lines()
         self.lines_per_page = 18
         self.update_lines()
 
+
+        # root = BoxLayout(orientation='vertical', padding=0)
+        # for i in range(self.lines_per_page):
+        #     self.justified_line = JustifiedBoxLayout(self.final_lines[i].split(), 40)
+        #     # print(self.final_lines[0:5])
+        #     # print(self.lines_per_page)
+        #     root.add_widget(self.justified_line)
+        # # return root
+
         return layout
+
+    def clear_hightlights_all(self):
+        # Loop through all children of the layout
+        for widget in self.root.children:
+            for labels in widget.children:
+                if isinstance(labels, Label):  
+                    labels.color = (1, 1, 1, 1)
     
     def resplit_lines(self):
         print("============")
@@ -259,7 +266,7 @@ class BookApp(App):
             print(i, self.final_lines[i], end="")
             page += self.final_lines[i]
 
-            if i > self.number_of_lines - 1:
+            if i > self.number_of_lines - 2:
                 print("Lines have ended")
                 return page
 

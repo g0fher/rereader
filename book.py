@@ -71,9 +71,9 @@ def split_pars_into_lines(final_lines, paragraphs, max_width_px, font):
     for par in paragraphs:
         lines = break_text_into_lines(par, max_width_px, font)
         for line in lines:
-            # final_lines.append(line + " ")
-            final_lines.append(line + "\n")
-        # final_lines[len(final_lines) - 1] += "\n"
+            final_lines.append(line)
+            # final_lines.append(line + "\n")
+        final_lines[len(final_lines) - 1] += "\n"
     
     return final_lines
 
